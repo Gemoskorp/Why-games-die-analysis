@@ -1,11 +1,9 @@
-# -Consulting_research
-Анализ рынка консалтинга и создание посредника
 
 # Название компании
 
 Expanse
 
-## Состаd группы
+## Состав группы
 
 Бокатенко Вадим (github: Gemoskorp), Федусенко Илья (github: fedusenkoilya-dev)
 
