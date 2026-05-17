@@ -23,3 +23,17 @@ class MetacriticParser(BaseParser):
             "user_score":     get_score(".c-productScoreInfo_scoreNumber span"),
             "critic_reviews": get_score(".c-productScoreInfo_reviewsTotal"),
         }
+
+
+
+if __name__ == "__main__":
+    import pandas as pd
+    import sys
+    sys.path.append(".")
+    
+    game_names = pd.read_csv("data/game_ids.csv")["name"].tolist()
+    print(f"Игр для парсинга: {len(game_names)}")
+    
+    parser = MetacriticParser()
+    df = parser.parse_all(game_names)
+    print(f"Готово! Спарсено: {len(df)}")
