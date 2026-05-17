@@ -37,3 +37,14 @@ class SteamAPIParser(BaseParser):
             "achievements":    d.get("achievements", {}).get("total", 0),
             "languages_count": len(d.get("supported_languages", "").split(",")),
         }
+if name == "main":
+    import pandas as pd
+    import sys
+    sys.path.append(".")
+    
+    game_ids = pd.read_csv("data/game_ids.csv")["steam_id"].tolist()
+    print(f"Игр для парсинга: {len(game_ids)}")
+    
+    parser = SteamAPIParser()
+    df = parser.parse_all(game_ids)
+    print(f"Готово! Спарсено: {len(df)}")
