@@ -23,7 +23,7 @@
 - dashboard/   — интерактивный дэшборд
 
 ## Как запустить
-1)pip install -r requirements.txt
-2)python scripts/get_game_ids.py
-3)python scripts/run_pipeline.py
-4)python dashboard/app.py
+1) pip install -r requirements.txt
+2) python scripts/get_game_ids.py
+3) python scripts/run_pipeline.py
+4) python dashboard/app.py
