@@ -65,3 +65,15 @@ class HLTBParser(BaseParser):
             return match.group(1) if match else None
         except:
             return None
+            
+if name == "main":
+    import pandas as pd
+    import sys
+    sys.path.append(".")
+    
+    game_names = pd.read_csv("data/game_ids.csv")["name"].tolist()
+    print(f"Игр для парсинга: {len(game_names)}")
+    
+    parser = HLTBParser()
+    df = parser.parse_all(game_names)
+    print(f"Готово! Спарсено: {len(df)}")
