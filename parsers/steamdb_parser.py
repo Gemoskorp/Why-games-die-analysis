@@ -37,3 +37,16 @@ class SteamDBParser(BaseParser):
                 "peak_all_time": peak_value,
                 "online_history": json.dumps(history),
             }
+
+if __name__ == "__main__":
+    import pandas as pd
+    import sys
+    sys.path.append(".")
+    
+    game_ids = pd.read_csv("data/game_ids.csv")["steam_id"].tolist()
+    print(f"Игр для парсинга: {len(game_ids)}")
+    
+    parser = SteamDBParser()
+    df = parser.parse_all(game_ids)
+    print(f"Готово! Спарсено: {len(df)}")
+
