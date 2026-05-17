@@ -49,3 +49,19 @@ class IGDBParser(BaseParser):
             "is_singleplayer": "Single player" in modes,
             "is_coop":         "Co-operative" in modes,
         }
+if name == "main":
+    import pandas as pd
+    import sys
+    import os
+    sys.path.append(".")
+    
+    # ключи IGDB берём из переменных окружения
+    client_id     = os.getenv("IGDB_CLIENT_ID", "вставь_сюда")
+    client_secret = os.getenv("IGDB_CLIENT_SECRET", "вставь_сюда")
+    
+    game_names = pd.read_csv("data/game_ids.csv")["name"].tolist()
+    print(f"Игр для парсинга: {len(game_names)}")
+    
+    parser = IGDBParser(client_id=client_id, client_secret=client_secret)
+    df = parser.parse_all(game_names)
+    print(f"Готово! Спарсено: {len(df)}")
