@@ -28,3 +28,20 @@ class SteamReviewsParser(BaseParser):
             "positive_ratio":    round(positive / max(total, 1), 3),
             "review_score_desc": summary.get("review_score_desc", ""),
         }
+
+
+
+if __name__ == "__main__":
+    import pandas as pd
+    import sys
+    sys.path.append(".")
+    
+    game_ids = pd.read_csv("data/game_ids.csv")["steam_id"].tolist()
+    print(f"Игр для парсинга: {len(game_ids)}")
+    
+    parser = SteamReviewsParser()
+    df = parser.parse_all(game_ids)
+    print(f"Готово! Спарсено: {len(df)}")
+
+
+
