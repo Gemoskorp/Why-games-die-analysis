@@ -1,28 +1,50 @@
+from base_parser import BaseParser
 import requests
 import time
-from base_parser import BaseParser
+import pandas as pd
+
 
 class SteamAPIParser(BaseParser):
     BASE_URL = "https://store.steampowered.com/api/appdetails"
 
-    def __init__(self):
+    def __init__(self, country_code: str = "us"):
+        """
+        country_code: код страны для обхода региональных блокировок
+        us - США (рекомендуется, даёт максимум данных)
+        gb - Великобритания
+        de - Германия
+        """
         super().__init__("data/raw/steam_api", delay=1.5)
+        self.country_code = country_code
+        # Счётчики для статистики
+        self.not_found = []
+        self.wrong_type = []
 
     def parse_game(self, game_id: int) -> dict:
-        # ключ не нужен — это публичный Store API
-        r = requests.get(
-            self.BASE_URL,
-            params={"appids": game_id, "l": "english"},
-            timeout=10
-        ).json()
+        try:
+            # Добавляем параметр cc с кодом страны
+            r = requests.get(
+                self.BASE_URL,
+                params={
+                    "appids": game_id,
+                    "l": "english",
+                    "cc": self.country_code    # ← главное изменение
+                },
+                timeout=10
+            ).json()
+        except Exception as e:
+            return {}
 
         data = r.get(str(game_id), {})
         if not data.get("success"):
+            self.not_found.append(game_id)
             return {}
 
         d = data["data"]
 
+        # Можно разрешить не только игры, но и демо/DLC
         if d.get("type") != "game":
+            self.wrong_type.append(game_id)
             return {}
 
         return {
@@ -37,14 +59,49 @@ class SteamAPIParser(BaseParser):
             "achievements":    d.get("achievements", {}).get("total", 0),
             "languages_count": len(d.get("supported_languages", "").split(",")),
         }
-if name == "main":
-    import pandas as pd
+
+    def parse_all(self, game_ids: list) -> pd.DataFrame:
+        results = []
+        total = len(game_ids)
+        
+        for i, game_id in enumerate(game_ids):
+            print(f"{i+1}/{total}: Парсим {game_id}")
+            
+            data = self.parse_game(game_id)
+            if data:
+                results.append(data)
+            
+            time.sleep(self.delay)
+        
+        # Выводим статистику
+        print(f"\n{'='*50}")
+        print(f"Статистика парсинга (регион: {self.country_code})")
+        print(f"{'='*50}")
+        print(f"Всего игр в списке: {total}")
+        print(f"Успешно спарсено: {len(results)}")
+        print(f"Не найдено (удалены или скрыты): {len(self.not_found)}")
+        print(f"Не игры (DLC, демо и т.д.): {len(self.wrong_type)}")
+        
+        if self.not_found:
+            print(f"\nПримеры не найденных ID: {self.not_found[:10]}")
+        
+        return pd.DataFrame(results)
+
+
+if __name__ == "__main__":
     import sys
     sys.path.append(".")
-    
+
     game_ids = pd.read_csv("data/game_ids.csv")["steam_id"].tolist()
     print(f"Игр для парсинга: {len(game_ids)}")
-    
-    parser = SteamAPIParser()
+    print("\nПробуем с регионом США (обходит блокировки)...")
+
+    # Используем регион США для обхода ограничений
+    parser = SteamAPIParser(country_code="us")
     df = parser.parse_all(game_ids)
-    print(f"Готово! Спарсено: {len(df)}")
+    
+    print(f"\nГотово! Спарсено: {len(df)}")
+    
+    # Сохраняем результат
+    df.to_csv("data/raw/steam_api/steam_games.csv", index=False)
+    print("Результат сохранён в data/raw/steam_api/steam_games.csv")
