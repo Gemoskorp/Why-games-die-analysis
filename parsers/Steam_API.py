@@ -23,7 +23,7 @@ class SteamAPIParser(BaseParser):
                 params={
                     "appids": game_id,
                     "l": "english",
-                    "cc": self.country_code    # ← главное изменение
+                    "cc": self.country_code    
                 },
                 timeout=10
             ).json()
@@ -89,9 +89,7 @@ if __name__ == "__main__":
 
     game_ids = pd.read_csv("data/game_ids.csv")["steam_id"].tolist()
     print(f"Игр для парсинга: {len(game_ids)}")
-    print("\nПробуем с регионом США (обходит блокировки)...")
 
-    # Используем регион США для обхода ограничений
     parser = SteamAPIParser(country_code="us")
     df = parser.parse_all(game_ids)
     
