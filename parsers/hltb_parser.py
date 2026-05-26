@@ -5,35 +5,17 @@ from datetime import datetime
 import time
 
 def get_hltb_data(game_names, save_csv=True, output_dir="data/raw/hltb", delay=1.5):
-    """
-    Получает данные о времени прохождения игр через библиотеку howlongtobeatpy
-    
-    Параметры:
-    ----------
-    game_names : list
-        Список названий игр
-    save_csv : bool
-        Сохранять ли результат в CSV файл
-    output_dir : str
-        Папка для сохранения CSV файла
-    delay : float
-        Задержка между запросами (секунды)
-    
-    Возвращает:
-    ----------
-    pandas.DataFrame
-        DataFrame с данными об играх
-    """
+ 
     results = []
     hltb = HowLongToBeat()
     total = len(game_names)
     found_count = 0
     not_found_count = 0
     
-    print("=" * 60)
+
     print(f"Начинаем парсинг {total} игр")
     print(f"Задержка между запросами: {delay} сек")
-    print("=" * 60)
+
     
     # Создаём папку для сохранения промежуточных результатов
     os.makedirs(output_dir, exist_ok=True)
@@ -141,21 +123,7 @@ def get_hltb_data(game_names, save_csv=True, output_dir="data/raw/hltb", delay=1
 
 
 def load_game_names_from_csv(csv_path, name_column='name'):
-    """
-    Загружает названия игр из CSV файла
     
-    Параметры:
-    ----------
-    csv_path : str
-        Путь к CSV файлу
-    name_column : str
-        Название колонки с именами игр
-    
-    Возвращает:
-    ----------
-    list
-        Список названий игр
-    """
     try:
         df = pd.read_csv(csv_path)
         game_names = df[name_column].tolist()
@@ -172,16 +140,7 @@ def load_game_names_from_csv(csv_path, name_column='name'):
 
 
 def resume_parsing_from_partial(partial_file, output_dir="data/raw/hltb"):
-    """
-    Возобновляет парсинг с последнего сохранённого места
-    
-    Параметры:
-    ----------
-    partial_file : str
-        Путь к файлу с промежуточными результатами
-    output_dir : str
-        Папка для сохранения результата
-    """
+  
     # Загружаем уже обработанные игры
     done_df = pd.read_csv(partial_file)
     done_names = set(done_df['name'].tolist())
@@ -214,14 +173,11 @@ def resume_parsing_from_partial(partial_file, output_dir="data/raw/hltb"):
         return done_df
 
 
-# ============================================
-# ОСНОВНОЙ ЗАПУСК
-# ============================================
 
 if __name__ == "__main__":
-    print("=" * 60)
+
     print("ПАРСИНГ HOWLONGTOBEAT ДЛЯ 750 ИГР")
-    print("=" * 60)
+
     
     # Загружаем названия игр из CSV файла
     game_names = load_game_names_from_csv("data/game_ids.csv", name_column='name')
@@ -239,15 +195,6 @@ if __name__ == "__main__":
         )
         
         # Показываем краткую статистику
-        print("\n" + "=" * 60)
-        print("КРАТКАЯ СТАТИСТИКА")
-        print("=" * 60)
-        
-        # Выводим первые 10 результатов
-        print("\nПервые 10 найденных игр:")
-        found_df = df_hltb[df_hltb['hltb_main'].notna()].head(10)
-        for _, row in found_df.iterrows():
-            print(f"  {row['name']}: {row['hltb_main']} ч (совпадение: {row['similarity']:.2f})")
         
         # Статистика по времени прохождения
         print("\nСтатистика по времени прохождения (найденные игры):")
