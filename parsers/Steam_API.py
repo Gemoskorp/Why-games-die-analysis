@@ -7,13 +7,8 @@ import pandas as pd
 class SteamAPIParser(BaseParser):
     BASE_URL = "https://store.steampowered.com/api/appdetails"
 
-    def __init__(self, country_code: str = "us"):
-        """
-        country_code: код страны для обхода региональных блокировок
-        us - США (рекомендуется, даёт максимум данных)
-        gb - Великобритания
-        de - Германия
-        """
+    def __init__(self, country_code: str = "us"): #здесь us тк много игр в России не доступно
+       
         super().__init__("data/raw/steam_api", delay=1.5)
         self.country_code = country_code
         # Счётчики для статистики
